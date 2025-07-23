@@ -1,19 +1,32 @@
 #!/bin/bash
 
-echo "🔨 Starting Build Process..."
+echo "🔍 Starting CI Build"
 
-# Simulate some setup work
-echo "Installing dependencies..."
-sleep 2
+# Step 1: Dependency Check
+echo "📦 Checking dependencies..."
+if ! command -v curl &> /dev/null; then
+  echo "❌ curl not installed. Installing..."
+  sudo yum install -y curl
+else
+  echo "✅ curl is already installed"
+fi
 
-# Simulate test phase
-echo "Running tests..."
-sleep 2
-echo "✅ All tests passed!"
+# Step 2: Run Tests
+echo "🧪 Running unit tests..."
+sleep 1
+TEST_RESULT=$((RANDOM % 2))  # randomly pass/fail for simulation
 
-# Simulate deployment
-echo "Deploying application..."
-sleep 2
-echo "🚀 Application Deployed Successfully!"
+if [ "$TEST_RESULT" -eq 0 ]; then
+  echo "✅ Tests Passed"
+else
+  echo "❌ Tests Failed"
+  exit 1
+fi
 
+# Step 3: Deploy simulation
+echo "🚀 Deploying application..."
+mkdir -p output
+echo "This is the deployed artifact" > output/deploy.log
+
+echo "🎉 CI Build Successful"
 exit 0
