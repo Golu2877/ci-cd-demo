@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'USERNAME', defaultValue: 'kavita', description: 'Enter your name')
+        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests?')
+        choice(name: 'DEPLOY_ENV', choices: ['dev', 'staging', 'prod'], description: 'Environment?')
+    }
+
+    stages {
+        stage('Start') {
+            steps {
+                echo "Pipeline started by: ${params.USERNAME}"
+                echo "Deployment Env: ${params.DEPLOY_ENV}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    try {
+                        echo 'Building application...'
+                        sh 'exit 1'  // Simulated failure
+                    } catch (err) {
+                        echo 'Build failed, handled inside pipeline'
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            when {
+                expression { return !params.SKIP_TESTS }
+            }
+            steps {
+                echo 'Running tests...'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'echo Build logs generated > build.log'
+                archiveArtifacts artifacts: 'build.log', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ SUCCESS: Pipeline completed.'
+        }
+        failure {
+            echo '❌ FAILED: Something went wrong.'
+        }
+    }
+}
